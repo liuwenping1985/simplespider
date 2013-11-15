@@ -1,6 +1,5 @@
 package com.lwp.spider;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,6 @@ public class SimpleSpider extends AbstractSpider {
 		// TODO Auto-generated method stub
 		List<String> retList = new ArrayList<String>();
 		try {
-
 			
 			Parser parser = new Parser(UIUtils.readContent(url,"gb2312"));
 			parser.setEncoding("gb2312");

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +35,7 @@ public final class UIUtils {
 		InputStream ins = null;
 		StringBuilder stb = new StringBuilder();
 		try {
+				
 			ins = new URL(url).openConnection().getInputStream();
 
 			byte[] buffer = new byte[2046];

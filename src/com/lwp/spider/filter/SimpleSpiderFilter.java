@@ -7,14 +7,17 @@ public  class SimpleSpiderFilter implements SpiderFilter{
 
 	@Override
 	public boolean acceptUrl(String url) {
-		if(url.startsWith("http://blog.sina.com.cn/s/blog")){
-			return true;
-		}
-		return false;
+//		if(url.startsWith("http://blog.sina.com.cn/s/blog")){
+//			return true;
+//		}
+		return true;
 	}
 
 	@Override
 	public boolean acceptLinkTag(String text) {
+		if("123".equals("123")){
+			return true;
+		}
 		// TODO Auto-generated method stub
 		for(String str:KEY_WORD_LIST){
 			if(text.contains(str)){

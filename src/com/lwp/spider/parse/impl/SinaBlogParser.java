@@ -1,16 +1,22 @@
 package com.lwp.spider.parse.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.htmlparser.Node;
 import org.htmlparser.Parser;
 import org.htmlparser.filters.AndFilter;
 import org.htmlparser.filters.HasAttributeFilter;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.tags.Div;
-import org.htmlparser.tags.TableColumn;
-import org.htmlparser.tags.TableTag;
 import org.htmlparser.util.NodeList;
-import org.htmlparser.util.ParserException;
-import org.htmlparser.visitors.NodeVisitor;
 
 import com.lwp.spider.parse.ArticalParser;
 import com.lwp.spider.util.UIUtils;
@@ -69,41 +75,71 @@ public class SinaBlogParser implements ArticalParser {
 	}
 
 	public static void main(String[] args) {
-		String content = UIUtils.readContent("http://lme.cnmc.com.cn/html/lme_metal.html");
-		System.out.println(content);
-	
+		//String content = UIUtils.readContent("http://www.360doc.com/ajax/getreadroomart.ashx?pagenum=25&curnum=1&cid=9&scid=70&iscream=1&sort=1&_="+new Date().getTime());
+		/**
+		  HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams,5000); //设置连接超时为5秒
+        HttpClient client = new DefaultHttpClient(httpParams); // 生成一个http客户端发送请求对象
+        HttpPost httpPost = new HttpPost(urlString); //设定请求方式
+		 */
+		
+		//HttpUriRequest request = new HttpUriRequest();
+		
+		HttpClient client = new HttpClient(); 
+		HttpMethod method = new GetMethod("http://www.360doc.com/ajax/getreadroomart.ashx?pagenum=25&curnum=1&cid=9&scid=70&iscream=1&sort=1&_="+new Date().getTime());
 		try {
+			Header header = new Header();
+			header.setName("Referer");
+			header.setValue("http://www.360doc.com/classarticle70.html");
+			method.addRequestHeader(header);
+			client.executeMethod(method);
+			InputStream ins=null;
 			StringBuilder stb = new StringBuilder();
-			Parser parser = new Parser(content);
-			NodeList tableList = parser.extractAllNodesThatMatch(new TagNameFilter("table"));
-			int tblSize = tableList.size();
-			for(int i=0;i<tblSize;i++){
-				TableTag table = (TableTag)tableList.elementAt(i);
-				NodeList tableRowList = table.getChildren().extractAllNodesThatMatch(new TagNameFilter("tr"));
-				if(tableRowList.size()>0){
-					for(int j=0;j<tableRowList.size();j++){
-						Node row = tableRowList.elementAt(j);
-						NodeList tableCellList = row.getChildren();
-						for(int k=0;k<tableCellList.size();k++){
-							Node cell = tableCellList.elementAt(k);
-							//org.htmlparser.tags.TableColumn.class
-							if(cell instanceof TableColumn){
-								TableColumn col = (TableColumn)cell;
-								col.setAttribute("height", "20px");
-							}
-						}
+			try {
+					
+				ins = method.getResponseBodyAsStream();
+				
+
+				byte[] buffer = new byte[2046];
+				int read = 0;
+				
+				while ((read = ins.read(buffer)) > 0) {
+					if (read == 2046) {
+						stb.append(new String(buffer,"UTF-8"));
+					} else {
+						byte[] real = new byte[read];
+						System.arraycopy(buffer, 0, real, 0, read);
+						stb.append(new String(real,"UTF-8"));
+					}
+
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally{
+				if(ins!=null){
+					try {
+						ins.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
-				stb.append(table.toHtml());
-				if(i == 0){
-					stb.append("<hr/>");
-				}
 			}
+			
 			System.out.println(stb.toString());
-		} catch (ParserException e) {
+		} catch (HttpException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//client.execute(arg0)
+		
+	//	System.out.println(content);
+	
+	
 	
 	}
 
